@@ -47,10 +47,17 @@
 
     </div>
 
-    <div>
-        <h3>Participants</h3>
-        <hr>
-    </div>
+        <div>
+            <h3>Participants</h3>
+            <hr>
+
+            <!--participants diambil dari context room- participants diviews--> 
+            {% for user in participants %}
+            <div>
+                <p>@{{user.username}}</p>
+            </div>
+            {% endfor %}
+        </div>
 
 </div>
 
