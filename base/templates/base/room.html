@@ -25,13 +25,16 @@
     <!--room_massages ambil dari views ->room ->room_messages  -->
         {% for message in room_messages %}
         <div>
+            {% if request.user == message.user %}
+              
+            <a href="% url 'delete-message' message.id %">Delete</a>
+            {% endif %}
             <small>@{{ message.user }} {{ message.created|timesince }} ago </small>
             <p>{{ message.body }}</p>
             
             <hr>
         </div>
         {% endfor %}
-
     </div>
 
     {% if request.user.is_authenticated %}
