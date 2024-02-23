@@ -78,14 +78,12 @@ def home(request):
 
     # add topics at left sidebar
     topics = Topic.objects.all()
-
     # calculate total room available
     room_count = rooms.count()
-
-    context = {"rooms": rooms, "topics": topics, "room_count": room_count}
-
+    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
+    context = {"rooms": rooms, "topics": topics, "room_count": room_count, "room_message":room_messages}
+    
     return render(request, "base/home.html", context)
-
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
@@ -93,6 +91,7 @@ def room(request, pk):
     participants = room.participants.all()
     
     if request.method == "POST":
+
         # detail user, room dan body diambil dari Message models.py
         message = Message.objects.create(
             user = request.user,
@@ -106,17 +105,29 @@ def room(request, pk):
     return render(request, "base/room.html", context)
 
 
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    room_messages = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {'user':user, 'rooms':rooms, 'room_messages':room_messages, 'topics':topics}
+    return render(request, 'base/profile.html', context)
+
+
 @login_required(login_url="login")
 def createRoom(request):
     form = RoomForm()
-
     if request.method == "POST":
         # add data to the forms
         form = RoomForm(request.POST)
         # if form valid
         if form.is_valid():
+            # get the room value, that can give instance of the room.
+            room = form.save(commit=False)
+            # host can be automatic base whoever login. automatik detect user yang login
+            room.host = request.user
             # then save a post data
-            form.save()
+            room.save()
             # redirect to home page
             return redirect("home")
 
